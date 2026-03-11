@@ -12,7 +12,7 @@ It provides a TUI (Text User Interface) to paint ASCII art, complementing existi
 - Simple keybinds.
 - Portable usage via AppImage.
 
-## Installation
+## Build/Installation
 
 To build the program from source, first clone the repo and then run:
 
@@ -27,6 +27,8 @@ This will:
 
 > The usage is identical for the binary and the AppImage. The AppImage exists for portability in case a compiled binary doesn’t run due to missing dependencies or ELF issues.
 
+> NOTE: if using the binary, make sure that all .so files present in the build directory are in the same directory as the binary, or the binary will fail to find the custom shared libraries
+
 ## Usage
 
 1. Navigate to the directory containing your ASCII art project files (.blprt and .clr formats).  
@@ -34,7 +36,9 @@ This will:
 
 2. Run the binary or AppImage:
     ```bash
-    ./build/ANCIIArtAnsiPainter   # or ./build/ANCIIArtAnsiPainter.AppImage
+    $ ./build/ANCIIArtAnsiPainter.AppImage
+    $ # OR
+    $ ./build/ANCIIArtAnsiPainter
     ```
 
 3. Select the mode (ANSI4 or ANSI8) from the menu.  
