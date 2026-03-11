@@ -1,0 +1,14 @@
+.idea/
+.venv/
+/build/
+*.swp
+*.swo
+*.DS_Store
+*.vscode/
+*.log
+*.o
+*.tmp
+*.bak
+__pycache__/
+*.pyc
+*.pyo

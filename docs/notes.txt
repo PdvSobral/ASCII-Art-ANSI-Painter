@@ -1,0 +1,12 @@
+ Project: my_art.blprt / my_art.clr   |  Current Color: 0x1F █
+
+ ┌ Palette ───────────────────────┐   ┌ Canvas ──────────────────────────────┐
+ │ (16x16 color grid here)        │   │ ASCII art area                       │
+ │                                │   │                                      │
+ └────────────────────────────────┘   └──────────────────────────────────────┘
+
+ [SPACE] Paint   [C] Swap   [S] Save   [R] Reload   [N] Rename   [O] Open
+
+
+--------------------
+
