@@ -13,7 +13,7 @@
 #pragma GCC poison int unsigned short strlen size_t pause
 
 #include "functions.c"
-#include "linked_lists.c"
+#include "linked_lists.h"
 
 // Define some macros for use "in the source code"
 #define AGGRESSIVE // If defined, CTRL+D is disabled in the current terminal, and a custom handler for CTRL+C is activated.

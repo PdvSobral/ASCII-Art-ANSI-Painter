@@ -14,7 +14,12 @@ APPIMAGE_DIR="$PROJECT_ROOT/packaging/AppDir"
 
 mkdir -p "$BUILD"
 
-gcc -D psystem -Wall -Wextra -Wpedantic "$SRC/main.c" -o "$BUILD/$APP_NAME-$VERSION-x86_64"
+# linkedlists is lookes into "$SRC/libraries" and appends lib<NAME>.so
+gcc "$SRC/main.c"\
+  -Wall -Wextra -Wpedantic\
+  -L "$SRC/libraries"\
+  -l linkedlists\
+  -o "$BUILD/$APP_NAME-$VERSION-x86_64"
 
 # changed file name to main, as expected by appimage previous configurations
 cp "$BUILD/$APP_NAME-$VERSION-x86_64" "$APPIMAGE_DIR/usr/bin/main"
