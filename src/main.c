@@ -7,8 +7,6 @@
 #include <signal.h>	  // To remap CTRL+C
 #include <string.h>	  // strcmp, strlens
 #include <unistd.h>	  // sleep, STDIN_FILENO
-#include <dirent.h>	  // for directory listing
-#include <inttypes.h> // for string formating (like PRIu64)
 
 #pragma GCC poison int unsigned short strlen size_t pause
 
