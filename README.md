@@ -46,11 +46,27 @@ This will:
 
 4. Use the keybinds displayed at the bottom left of the interface to paint your art.
 
+## Project creation
+Example of project creation:
+
+```bash
+$ cd ./assets
+$ python3 ../scripts/project_creator.py -o dragon-ansi dragon_ansi
+```
+
+## Turning the Project into an ASCII ANSI text file
+Example of project "compilation":
+
+```bash
+$ cd ./assets
+$ python3 ../scripts/art_assembler.py -o dragon-ansi.txt -x dragon-ansi
+```
+
 ## Current Limitations
 
-- Project creation is manual; the program does not yet offer a way to create `.blprt` or `.clr` files.
+- Project creation and exportation (compilation) is currently done with supplementary python scripts
+- Project creation is opinionated; the program only supports conversion to `.blprt` or `.clr` files of simple ASCII art.
 - Only ANSI8 mode is functional; ANSI4 mode is not yet implemented.
-- The rendering to a final text format is currently done using a separate python script (`./scripts/art_assembler`) piped to the save file
 
 ## TODO
 

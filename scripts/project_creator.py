@@ -63,7 +63,7 @@ if __name__ == "__main__":
         for line in blueprint_lines:
             file.write(f"{line: <{max_len}}\n")
 
-    print(max_len, len(blueprint_lines), max_len * len(blueprint_lines))
+    # print(max_len, len(blueprint_lines), max_len * len(blueprint_lines))
 
     with open(f"{OUTPUT_NAME}.clr", "wb") as file:
         # default colour is 0x07, normal terminal grey
