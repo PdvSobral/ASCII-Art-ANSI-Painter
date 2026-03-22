@@ -606,7 +606,30 @@ void editor_main_loop(){
 	return;
 }
 
-int32_t main(void){
+int32_t create_project(int32_t argc, char** argv){
+    // TODO: convert /scripts/project_creator.py to here
+    return 0;
+};
+int32_t compile_project(int32_t argc, char** argv){
+    // TODO: convert /scripts/art_assembler.py to here
+    return 0;
+};
+
+int32_t main(int32_t argc, char** argv){
+    if (argc > 1) {
+        if (strcmp(argv[1], "help") == 0) {
+            printf("Help/usage message :)");
+            return 0;
+        } else if (strcmp(argv[1], "create") == 0) {
+            return create_project(argc, argv);
+        } else if (strcmp(argv[1], "compile") == 0) {
+            return compile_project(argc, argv);
+        } else {
+            fprintf(stderr, "Mode '%s' not recognized! Use mode 'help' to display help/usage message.", argv[1]);
+            return 1;
+        }
+    }
+
 	#ifdef AGGRESSIVE
 		signal(SIGINT, handle_sigint_temp);
 		disable_ctrl_d();
@@ -621,7 +644,7 @@ int32_t main(void){
 		escolha_menu = menu("PLEASE CHOOSE ANSI COLOUR DEPTH ", CABECALHO_LEN, main_menu, len_main_menu, 1);
 		if(escolha_menu==0) break;
 		switch(escolha_menu){
-			case 1: PALLET_MODE = 0x04; editor_main_loop(); break;
+			//case 1: PALLET_MODE = 0x04; editor_main_loop(); break;
 			case 2: PALLET_MODE = 0x08; editor_main_loop(); break;
 			default: printf("\nFunção ainda não implementada!!\n");
 		}
