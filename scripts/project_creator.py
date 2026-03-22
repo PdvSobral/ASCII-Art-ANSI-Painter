@@ -36,7 +36,7 @@ if __name__ == "__main__":
             INPUT_NAME = argv[1]
             argv.pop(1)
         else:
-            print(f"Unrecognized option '{argv[1]}!'\nUse '--help' to see usage.")
+            print(f"Unrecognized option '{argv[1]}'!\nUse '--help' to see usage.")
             exit_(1)
 
     if INPUT_NAME == "":
@@ -55,7 +55,7 @@ if __name__ == "__main__":
 
     while blueprint_lines[-1] == "" or blueprint_lines[-1] is None:
         blueprint_lines.pop(-1)
-    while blueprint_lines[0] == "" or blueprint_lines[-1] is None:
+    while blueprint_lines[0] == "" or blueprint_lines[0] is None:
         blueprint_lines.pop(0)
 
     with open(f"{OUTPUT_NAME}.blprt", "wt") as file:

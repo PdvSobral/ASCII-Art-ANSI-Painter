@@ -96,7 +96,7 @@ if __name__ == "__main__":
 
     while blueprint_lines[-1] == "" or blueprint_lines[-1] is None:
         blueprint_lines.pop(-1)
-    while blueprint_lines[0] == "" or blueprint_lines[-1] is None:
+    while blueprint_lines[0] == "" or blueprint_lines[0] is None:
         blueprint_lines.pop(0)
 
     colors: bytes
