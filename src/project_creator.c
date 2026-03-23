@@ -24,9 +24,14 @@ void print_help(char** argv, char* mode){ //mode = "create"
     return;
 }
 
+void free_line(void* data){
+    if (data != NULL) free(data);
+}
 
-int32_t main(int32_t argc, char** argv){
+int32_t project_creator_main(int32_t argc, char** argv){
+    printf("Starting with mode 'create'...\n");
     // we will assume mode already taken care of.
+    // TODO: use char* strdup(char*); to copy argument string to a new location dynamically if to use
     if (argc <= 2) {
         fprintf(stderr, "No input file provided!");
         return 1;
@@ -82,7 +87,7 @@ int32_t main(int32_t argc, char** argv){
 
     // TODO: Add the rest of the translation here,
     //  as of now, this is the GPT translation
-
+    printf("Opening input file '%s'...\n", INPUT_NAME);
     FILE* input_file = fopen(INPUT_NAME, "rt");
     if (!input_file) { // maybe use printerr (if I recall it also printed stack)
         fprintf(stderr, "Failed to open input file '%s'!\n", INPUT_NAME);
@@ -101,6 +106,7 @@ int32_t main(int32_t argc, char** argv){
 	// will contain the result of an ftell, so since the file to read is at most uint16_t*uint16_t, uint32_t is enough to handle
 	uint32_t start_of_line = ftell(input_file);
 
+    printf("Reading lines from input file...\n");
 	while (1) {
 		bytesRead = fread(buffer, 1, BUFFER_SIZE-1, input_file);
 		// TODO, if fails to read or reads less than expected, handle accordingly
@@ -126,13 +132,22 @@ int32_t main(int32_t argc, char** argv){
 	}
 	fclose(input_file);
 
-
     // Trim empty lines at start and end (assuming the bluprint always has at least one valid line)
     // TODO: add check for blueprint size so it does not become empty
     // TODO: update linked_lists to allow for NULL reference in data_handler. As of now, it tries to call NULL(*data)
-    while (blueprint_lines->head->data == NULL) remove_node_at_index(blueprint_lines, 0, free);
-    while (blueprint_lines->tail->data == NULL) remove_node_at_index(blueprint_lines, blueprint_lines->size-1, free);
+    if (blueprint_lines->size == 0) {
+        fprintf(stderr, "No lines read in input file!\n");
+        return 1;
+    } else printf("Read %d lines from input file.\n", blueprint_lines->size);
+    fflush(stdout);
 
+    printf("Removing trailing empty lines...");
+    while (blueprint_lines->head->data == NULL) remove_node_at_index(blueprint_lines, 0, free_line);
+    printf("Removing empty lines at end...");
+    while (blueprint_lines->tail->data == NULL) remove_node_at_index(blueprint_lines, blueprint_lines->size-1, free_line);
+
+    if (OUTPUT_NAME != NULL) // will be almost 100%, since there is a default
+    printf("OUTPUT_NAME='%s'", OUTPUT_NAME);
     /*
     TODO: finish translating
     // --- Write the .blprt file ---
@@ -179,6 +194,6 @@ int32_t main(int32_t argc, char** argv){
 
     // Cleanup linked list
     destroy_linked_list(blueprint_lines, free);
-    */
+    //*/
     return 0;
 }

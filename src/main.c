@@ -8,10 +8,11 @@
 #include <string.h>	  // strcmp, strlens
 #include <unistd.h>	  // sleep, STDIN_FILENO
 
-#pragma GCC poison int unsigned short strlen size_t pause
+#pragma GCC poison int unsigned short size_t pause
 
 #include "functions.c"
 #include "linked_lists.h"
+#include "project_creator.c"
 
 // Define some macros for use "in the source code"
 #define AGGRESSIVE // If defined, CTRL+D is disabled in the current terminal, and a custom handler for CTRL+C is activated.
@@ -606,25 +607,21 @@ void editor_main_loop(){
 	return;
 }
 
-int32_t create_project(int32_t argc, char** argv){
-    // TODO: convert /scripts/project_creator.py to here
-    return 0;
-};
 int32_t compile_project(int32_t argc, char** argv){
+    (void) argc;
+    (void) argv;
     // TODO: convert /scripts/art_assembler.py to here
     return 0;
-};
+}
 
 int32_t main(int32_t argc, char** argv){
     if (argc > 1) {
         if (strcmp(argv[1], "help") == 0) {
             printf("Help/usage message :)");
             return 0;
-        } else if (strcmp(argv[1], "create") == 0) {
-            return create_project(argc, argv);
-        } else if (strcmp(argv[1], "compile") == 0) {
-            return compile_project(argc, argv);
-        } else {
+        } else if (strcmp(argv[1], "create") == 0) return project_creator_main(argc, argv);
+        else if (strcmp(argv[1], "compile") == 0) return compile_project(argc, argv);
+        else {
             fprintf(stderr, "Mode '%s' not recognized! Use mode 'help' to display help/usage message.", argv[1]);
             return 1;
         }
