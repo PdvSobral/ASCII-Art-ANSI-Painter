@@ -24,6 +24,7 @@ void print_help(char** argv, char* mode){ //mode = "create"
     return;
 }
 
+// TODO: currently many mem leaks, on every return needs to free the before
 int32_t project_creator_main(int32_t argc, char** argv){
     printf("Starting with mode 'create'...\n");
     // we will assume mode already taken care of.
@@ -106,8 +107,12 @@ int32_t project_creator_main(int32_t argc, char** argv){
     printf("Reading lines from input file...\n");
 	while (1) {
 		bytesRead = fread(buffer, 1, BUFFER_SIZE-1, input_file);
-		// TODO, if fails to read or reads less than expected, handle accordingly
-		if (bytesRead == 0) break; // FIXME: make better handling
+		if (bytesRead == 0) {
+		    if (current_line_length != 0){
+		        buffer[0] = 0x0A;
+		        bytesRead = 1;
+		    } else break;
+		};
 
 		for (uint16_t i=0; i < bytesRead; i++){
 			if (buffer[i] == '\n') {
@@ -124,7 +129,7 @@ int32_t project_creator_main(int32_t argc, char** argv){
                     pointer_holder[current_line_length] = 0x00; // null-terminate
 
                     append_data_to_list(blueprint_lines, pointer_holder);
-                } else append_data_to_list(blueprint_lines, NULL); // if 0 simply add NULL
+                } else append_data_to_list(blueprint_lines, NULL); // if length 0 simply add NULL
 
 				fseek(input_file, 1, SEEK_CUR); // move one byte over (the /n)
 
@@ -139,8 +144,6 @@ int32_t project_creator_main(int32_t argc, char** argv){
 	fclose(input_file);
 
     // Trim empty lines at start and end (assuming the bluprint always has at least one valid line)
-    // TODO: add check for blueprint size so it does not become empty
-    // TODO: update linked_lists to allow for NULL reference in data_handler. As of now, it tries to call NULL(*data)
     if (blueprint_lines->size == 0) {
         fprintf(stderr, "No lines read in input file!\n");
         return 1;
@@ -159,54 +162,53 @@ int32_t project_creator_main(int32_t argc, char** argv){
     fflush(stdout);
 
 
-    if (OUTPUT_NAME != NULL) // will be almost 100%, since there is a default
-    printf("OUTPUT_NAME='%s'", OUTPUT_NAME);
-    /*
-    TODO: finish translating
-    // --- Write the .blprt file ---
-    char blprt_filename[256];
-    snprintf(blprt_filename, sizeof(blprt_filename), "%s.blprt", OUTPUT_NAME);
-    FILE* blprt_file = fopen(blprt_filename, "wt");
-    if (!blprt_file) {
-        fprintf(stderr, "Failed to create output file '%s'\n", blprt_filename);
+    if (OUTPUT_NAME == NULL) { // will be almost 100%, since there is a default, but anyway
+        fprintf(stderr, "No valid project output name found!\n");
+        return 1;
+    } else printf("Preparing to save with project name '%s'.\n", OUTPUT_NAME);
+
+    pointer_holder = (char*)malloc(strlen(OUTPUT_NAME) + 7); // TODO: Chwck for NULL
+    strcpy(pointer_holder, OUTPUT_NAME);
+    strcpy(pointer_holder+strlen(OUTPUT_NAME), ".blprt"); // assume 0x00 is placed at end
+
+    printf("Creating file '%s'...\n", pointer_holder);
+
+    input_file = fopen(pointer_holder, "wt");
+    if (!input_file) {
+        fprintf(stderr, "Failed to create file '%s'!\n", pointer_holder);
         return 1;
     }
+    fprintf(input_file, "%u\n", max_len);
 
-    fprintf(blprt_file, "%u\n", max_len);
-
-    Node* current = blueprint_lines->head;
+    NODE* current = blueprint_lines->head;
     while (current != NULL) {
-        char* line = (char*) current->data;
-        if (line == NULL) line = ""; // empty line
-        // pad with spaces to max_len
-        fprintf(blprt_file, "%-*s\n", max_len, line);
+        // TODO: Maybe later paddout the line as the python script did
+        if (current->data == NULL)  fprintf(input_file, "\n");
+        else fprintf(input_file, "%s\n", ((char*)current->data));
         current = current->next;
     }
+    free(pointer_holder);
+    fclose(input_file);
 
-    fclose(blprt_file);
 
-
-    // --- Write the .clr file ---
-    char clr_filename[256];
-    snprintf(clr_filename, sizeof(clr_filename), "%s.clr", OUTPUT_NAME);
-    FILE* clr_file = fopen(clr_filename, "wb");
-    if (!clr_file) {
-        fprintf(stderr, "Failed to create color file '%s'\n", clr_filename);
+    pointer_holder = (char*)malloc(strlen(OUTPUT_NAME) + 5); // TODO: Chwck for NULL
+    strcpy(pointer_holder, OUTPUT_NAME);
+    strcpy(pointer_holder+strlen(OUTPUT_NAME), ".clr"); // assume 0x00 is placed at end
+    printf("Creating file '%s'...\n", pointer_holder);
+    input_file = fopen(pointer_holder, "wb");
+    if (!input_file) {
+        fprintf(stderr, "Failed to create file '%s'!\n", pointer_holder);
         return 1;
     }
 
-    // Default color 0x07, one byte per character
+    // Default color 0x07 (normal terminal grey), one byte per character
     uint32_t total_bytes = (uint32_t) max_len * (uint32_t) blueprint_lines->size;
     uint8_t color_byte = 0x07;
+    for (; total_bytes > 0; total_bytes--) fwrite(&color_byte, 1, 1, input_file); // TODO: add write check successful
+    fclose(input_file);
+    free(pointer_holder);
 
-    for (uint32_t i = 0; i < total_bytes; i++) {
-        fwrite(&color_byte, 1, 1, clr_file);
-    }
-
-    fclose(clr_file);
-
-    // Cleanup linked list
-    destroy_linked_list(blueprint_lines, free);
-    //*/
+    printf("Finished. Cleaning up...\n");
+    delete_linked_list(blueprint_lines, free);
     return 0;
 }
