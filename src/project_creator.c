@@ -186,11 +186,11 @@ int32_t project_creator_main(int32_t argc, char** argv){
 
     input_file = fopen(pointer_holder, "wt");
     if (!input_file) {
+        fprintf(stderr, "Failed to create file '%s'!\n", pointer_holder);
         free(OUTPUT_NAME);
         free(INPUT_NAME);
         free(pointer_holder);
         delete_linked_list(blueprint_lines, free);
-        fprintf(stderr, "Failed to create file '%s'!\n", pointer_holder);
         return 1;
     }
     fprintf(input_file, "%u\n", max_len);
@@ -212,11 +212,11 @@ int32_t project_creator_main(int32_t argc, char** argv){
     printf("Creating file '%s'...\n", pointer_holder);
     input_file = fopen(pointer_holder, "wb");
     if (!input_file) {
+        fprintf(stderr, "Failed to create file '%s'!\n", pointer_holder);
         free(OUTPUT_NAME);
         free(INPUT_NAME);
         free(pointer_holder);
         delete_linked_list(blueprint_lines, free);
-        fprintf(stderr, "Failed to create file '%s'!\n", pointer_holder);
         return 1;
     }
 
