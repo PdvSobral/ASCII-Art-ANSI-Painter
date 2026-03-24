@@ -24,10 +24,6 @@ void print_help(char** argv, char* mode){ //mode = "create"
     return;
 }
 
-void free_line(void* data){
-    if (data != NULL) free(data);
-}
-
 int32_t project_creator_main(int32_t argc, char** argv){
     printf("Starting with mode 'create'...\n");
     // we will assume mode already taken care of.
@@ -105,6 +101,7 @@ int32_t project_creator_main(int32_t argc, char** argv){
 	uint16_t bytesRead;
 	// will contain the result of an ftell, so since the file to read is at most uint16_t*uint16_t, uint32_t is enough to handle
 	uint32_t start_of_line = ftell(input_file);
+    char* pointer_holder;
 
     printf("Reading lines from input file...\n");
 	while (1) {
@@ -116,8 +113,17 @@ int32_t project_creator_main(int32_t argc, char** argv){
 			if (buffer[i] == '\n') {
 			    fseek(input_file, start_of_line, SEEK_SET); // reset to beginning of line
                 if (current_line_length != 0){
-                    // TODO: make the rest of the logic
-                    // read the line to a mallocd buffer and append to linkedlist of lines
+                    // Allocate memory for the line (+1 for null terminator)
+                    // TODO: check for null
+                    pointer_holder = (char*)malloc(current_line_length + 1);
+
+                    // Read the exact number of bytes for the line
+                    // TODO: check it was read correctly
+                    fread(pointer_holder, 1, current_line_length, input_file);
+
+                    pointer_holder[current_line_length] = 0x00; // null-terminate
+
+                    append_data_to_list(blueprint_lines, pointer_holder);
                 } else append_data_to_list(blueprint_lines, NULL); // if 0 simply add NULL
 
 				fseek(input_file, 1, SEEK_CUR); // move one byte over (the /n)
@@ -141,10 +147,17 @@ int32_t project_creator_main(int32_t argc, char** argv){
     } else printf("Read %d lines from input file.\n", blueprint_lines->size);
     fflush(stdout);
 
-    printf("Removing trailing empty lines...");
-    while (blueprint_lines->head->data == NULL) remove_node_at_index(blueprint_lines, 0, free_line);
-    printf("Removing empty lines at end...");
-    while (blueprint_lines->tail->data == NULL) remove_node_at_index(blueprint_lines, blueprint_lines->size-1, free_line);
+    printf("Removing trailing empty lines...\n"); fflush(stdout);
+    while (blueprint_lines->size > 0 && blueprint_lines->head->data == NULL) remove_node_at_index(blueprint_lines, 0, NULL);
+    printf("Removing empty lines at end...\n"); fflush(stdout);
+    while (blueprint_lines->size > 0 && blueprint_lines->tail->data == NULL) remove_node_at_index(blueprint_lines, blueprint_lines->size-1, NULL);
+
+    if (blueprint_lines->size == 0) {
+        fprintf(stderr, "No valid lines read in input file!\n");
+        return 1;
+    } else printf("Read %d valid lines from input file.\n", blueprint_lines->size);
+    fflush(stdout);
+
 
     if (OUTPUT_NAME != NULL) // will be almost 100%, since there is a default
     printf("OUTPUT_NAME='%s'", OUTPUT_NAME);

@@ -24,6 +24,11 @@ typedef struct _linkedlist {
     int16_t size;
 } LinkedList;
 
+/*
+NOTES:
+  On functions that receive data_handler, if NULL is passed instead of a valid function pointer, the call is skipped
+*/
+
 LinkedList*  create_linked_list		   ();
 NODE*        create_node               (void *data);
 NODE*        append_data_to_list       (LinkedList* list, void* data);
