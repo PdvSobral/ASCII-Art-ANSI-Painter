@@ -9,7 +9,7 @@
 
 char DEFAULT_OUTPUT_NAME[4] = "out";
 char NULL_STRING[5] = "null";
-char* OUTPUT_NAME = DEFAULT_OUTPUT_NAME;
+char* OUTPUT_NAME = NULL;
 char* INPUT_NAME = NULL;
 
 void print_help(char** argv, char* mode){ //mode = "create"
@@ -24,11 +24,10 @@ void print_help(char** argv, char* mode){ //mode = "create"
     return;
 }
 
-// TODO: currently many mem leaks, on every return needs to free the before
+// TODO: use char* strdup(char*); to copy argument string to a new location dynamically if to use
 int32_t project_creator_main(int32_t argc, char** argv){
     printf("Starting with mode 'create'...\n");
     // we will assume mode already taken care of.
-    // TODO: use char* strdup(char*); to copy argument string to a new location dynamically if to use
     if (argc <= 2) {
         fprintf(stderr, "No input file provided!");
         return 1;
@@ -43,7 +42,7 @@ int32_t project_creator_main(int32_t argc, char** argv){
 
         if ((strcmp(argv[i], "--output") == 0) || strcmp(argv[i], "-o") == 0) {
             if (++i < argc) {
-                OUTPUT_NAME = argv[i];
+                OUTPUT_NAME = strdup(argv[i]); // duplicate string TODO: check for NULL
 
                 uint64_t l_n = strlen(OUTPUT_NAME); //byte-size of str, no 0x00
                 for (uint64_t j = 0; j < l_n; j++) {
@@ -62,16 +61,22 @@ int32_t project_creator_main(int32_t argc, char** argv){
                         else char_ = (void*) NULL_STRING;
 
                         fprintf(stderr, "Invalid character '%s' found in output name!\n", ((char*) char_));
+                        free(OUTPUT_NAME);
+                        free(INPUT_NAME);
                         return 1;
                     }
                 }
             } else {
+                free(OUTPUT_NAME);
+                free(INPUT_NAME);
                 fprintf(stderr, "No output project name provided!");
                 return 1;
             }
         } else if ((i+1) == argc){
-            INPUT_NAME = argv[i];
+            INPUT_NAME = strdup(argv[i]); // duplicate string TODO: check for NULL
         } else {
+            free(OUTPUT_NAME);
+            free(INPUT_NAME);
             fprintf(stderr, "Unrecognized option '%s'!\nUse '--help' to see usage.", argv[i]);
             return 1;
         }
@@ -82,11 +87,11 @@ int32_t project_creator_main(int32_t argc, char** argv){
         return 1;
     }
 
-    // TODO: Add the rest of the translation here,
-    //  as of now, this is the GPT translation
     printf("Opening input file '%s'...\n", INPUT_NAME);
     FILE* input_file = fopen(INPUT_NAME, "rt");
     if (!input_file) { // maybe use printerr (if I recall it also printed stack)
+        free(OUTPUT_NAME);
+        free(INPUT_NAME);
         fprintf(stderr, "Failed to open input file '%s'!\n", INPUT_NAME);
         return 1;
     }
@@ -145,6 +150,9 @@ int32_t project_creator_main(int32_t argc, char** argv){
 
     // Trim empty lines at start and end (assuming the bluprint always has at least one valid line)
     if (blueprint_lines->size == 0) {
+        free(OUTPUT_NAME);
+        free(INPUT_NAME);
+        delete_linked_list(blueprint_lines, free);
         fprintf(stderr, "No lines read in input file!\n");
         return 1;
     } else printf("Read %d lines from input file.\n", blueprint_lines->size);
@@ -156,16 +164,19 @@ int32_t project_creator_main(int32_t argc, char** argv){
     while (blueprint_lines->size > 0 && blueprint_lines->tail->data == NULL) remove_node_at_index(blueprint_lines, blueprint_lines->size-1, NULL);
 
     if (blueprint_lines->size == 0) {
+        free(OUTPUT_NAME);
+        free(INPUT_NAME);
+        delete_linked_list(blueprint_lines, free);
         fprintf(stderr, "No valid lines read in input file!\n");
         return 1;
     } else printf("Read %d valid lines from input file.\n", blueprint_lines->size);
     fflush(stdout);
 
 
-    if (OUTPUT_NAME == NULL) { // will be almost 100%, since there is a default, but anyway
-        fprintf(stderr, "No valid project output name found!\n");
-        return 1;
-    } else printf("Preparing to save with project name '%s'.\n", OUTPUT_NAME);
+    if (OUTPUT_NAME == NULL) { // if not defined by user, use default
+        OUTPUT_NAME = strdup(DEFAULT_OUTPUT_NAME);
+    }
+    printf("Preparing to save with project name '%s'.\n", OUTPUT_NAME);
 
     pointer_holder = (char*)malloc(strlen(OUTPUT_NAME) + 7); // TODO: Chwck for NULL
     strcpy(pointer_holder, OUTPUT_NAME);
@@ -175,6 +186,10 @@ int32_t project_creator_main(int32_t argc, char** argv){
 
     input_file = fopen(pointer_holder, "wt");
     if (!input_file) {
+        free(OUTPUT_NAME);
+        free(INPUT_NAME);
+        free(pointer_holder);
+        delete_linked_list(blueprint_lines, free);
         fprintf(stderr, "Failed to create file '%s'!\n", pointer_holder);
         return 1;
     }
@@ -197,6 +212,10 @@ int32_t project_creator_main(int32_t argc, char** argv){
     printf("Creating file '%s'...\n", pointer_holder);
     input_file = fopen(pointer_holder, "wb");
     if (!input_file) {
+        free(OUTPUT_NAME);
+        free(INPUT_NAME);
+        free(pointer_holder);
+        delete_linked_list(blueprint_lines, free);
         fprintf(stderr, "Failed to create file '%s'!\n", pointer_holder);
         return 1;
     }
@@ -209,6 +228,8 @@ int32_t project_creator_main(int32_t argc, char** argv){
     free(pointer_holder);
 
     printf("Finished. Cleaning up...\n");
+    free(OUTPUT_NAME);
+    free(INPUT_NAME);
     delete_linked_list(blueprint_lines, free);
     return 0;
 }
