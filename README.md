@@ -1,8 +1,8 @@
 # ANCII Art ANSI Painter
 
-ANCII Art ANSI Painter (very creative, I know) is a terminal-friendly ASCII art painter designed for both ANSI4 and ANSI8 color modes. For now, only ANSI8 mode is fully functional.  
+ANCII Art ANSI Painter (very creative, I know) is a terminal-friendly ASCII art painter designed for both ANSI4 and ANSI8 color modes. For now, only ANSI8 mode is "fully" functional.  
 
-It provides a TUI (Text User Interface) to paint ASCII art, complementing existing ASCII art creation and editing projects rather than being a standalone replacement tool.
+It provides a TUI (Text User Interface) to colour ASCII art, complementing existing ASCII art creation and editing projects rather than being a standalone replacement tool.
 
 ## Features
 
@@ -44,22 +44,23 @@ This will:
 3. Select the mode (ANSI4 or ANSI8) from the menu.  
    > For now, only ANSI8 works.
 
-4. Use the keybinds displayed at the bottom left of the interface to paint your art.
+4. Use the keybinds displayed at the bottom left of the interface to colour your art.
 
 ## Project creation
+Currently, the creation of a project is done through the script `project_creator.py`, present in the `scripts` directory in the root of the repo. The usage is `python3 project_creator.py [OPTIONS ...] input_file`.
 Example of project creation:
-
 ```bash
 $ cd ./assets
-$ python3 ../scripts/project_creator.py -o dragon-ansi dragon_ansi
+$ python3 ../scripts/project_creator.py -o project-name simple-ascii-art.txt
 ```
+  > NOTE: This will create two output files (a .clr and a .blprt), and the input file must match exactly!
 
 ## Turning the Project into an ASCII ANSI text file
 Example of project "compilation":
 
 ```bash
 $ cd ./assets
-$ python3 ../scripts/art_assembler.py -o dragon-ansi.txt -x dragon-ansi
+$ python3 ../scripts/art_assembler.py -o output-art.txt -x project-name
 ```
 
 ## Current Limitations
@@ -77,4 +78,4 @@ $ python3 ../scripts/art_assembler.py -o dragon-ansi.txt -x dragon-ansi
 
 ## Background
 
-ANCII Art ANSI Painter started as a personal project to create a custom ASCII art for my terminal (originally for Neofetch, now FastFetch). After not finding a tool that fit my needs, I built this one. Some people have shown interest, so it’s now available for anyone who wants to use it.
+ANCII Art ANSI Painter started as a personal project to create a custom ASCII art for my terminal (originally for NeoFetch, now FastFetch). After not finding a tool that fit my needs, I built this one. Some people have shown interest, so it’s now available for anyone who wants to use it.

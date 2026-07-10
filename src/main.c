@@ -420,7 +420,7 @@ void editor_main_loop(){
     print_cursor();
 	while (1){
 	    // TODO: Finish writing the base loops for controlling the characters
-	    // TODO: Add a pick colour (like put coursor on top of a char, press key, and it gets the colour
+	    // TODO: Add a pick colour (like put cursor on top of a char, press key, and it gets the colour
 	    fflush(stdout);
 	    command = getch();
 	    if (command == 'q' || command == 'Q') {

@@ -24,7 +24,6 @@ void print_help(char** argv, char* mode){ //mode = "create"
     return;
 }
 
-// TODO: use char* strdup(char*); to copy argument string to a new location dynamically if to use
 int32_t project_creator_main(int32_t argc, char** argv){
     printf("Starting with mode 'create'...\n");
     // we will assume mode already taken care of.
@@ -42,8 +41,12 @@ int32_t project_creator_main(int32_t argc, char** argv){
 
         if ((strcmp(argv[i], "--output") == 0) || strcmp(argv[i], "-o") == 0) {
             if (++i < argc) {
-                OUTPUT_NAME = strdup(argv[i]); // duplicate string TODO: check for NULL
-
+                OUTPUT_NAME = strdup(argv[i]); // duplicate string
+                if (OUTPUT_NAME==NULL) {
+                    free(INPUT_NAME);
+                    fprintf(stderr, "Failed to allocate memory for the project output name!");
+                    return 1;
+                }
                 uint64_t l_n = strlen(OUTPUT_NAME); //byte-size of str, no 0x00
                 for (uint64_t j = 0; j < l_n; j++) {
                     char c = OUTPUT_NAME[j];
@@ -73,7 +76,12 @@ int32_t project_creator_main(int32_t argc, char** argv){
                 return 1;
             }
         } else if ((i+1) == argc){
-            INPUT_NAME = strdup(argv[i]); // duplicate string TODO: check for NULL
+            INPUT_NAME = strdup(argv[i]); // duplicate string
+            if (INPUT_NAME==NULL) {
+                free(OUTPUT_NAME);
+                fprintf(stderr, "Failed to allocate memory for the input file name!");
+                return 1;
+            }
         } else {
             free(OUTPUT_NAME);
             free(INPUT_NAME);
@@ -96,8 +104,14 @@ int32_t project_creator_main(int32_t argc, char** argv){
         return 1;
     }
 
-    // TODO: add check for valid memory allocation
     LinkedList* blueprint_lines = create_linked_list();
+    if (blueprint_lines==NULL) {
+        free(OUTPUT_NAME);
+        free(INPUT_NAME);
+        fprintf(stderr, "Failed to allocate memory for the linked list to hold the lines!");
+        return 1;
+    }
+
     // TODO: I will need to check for overflow possibility and stop saying too big!, probably a simple & 0xFFFF
     uint16_t max_len = 0;// PROJECT can only contain uint16_t on width/length
 
